@@ -3,13 +3,13 @@ package org.example.model;
 import java.net.Socket;
 import java.time.LocalDateTime;
 
-public class ClientSocket {
+public class Client {
 
     private  String name;
     private LocalDateTime localDateTimeClientAdd;
     private Socket socket;
 
-    public ClientSocket(String name, LocalDateTime localDateTimeClientAdd, Socket socket) {
+    public Client(String name, LocalDateTime localDateTimeClientAdd, Socket socket) {
         this.name = name;
         this.localDateTimeClientAdd = localDateTimeClientAdd;
         this.socket = socket;

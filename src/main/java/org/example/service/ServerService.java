@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.model.ClientSocket;
+import org.example.model.Client;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,7 +14,7 @@ public class ServerService {
     private ServerSocket serverSocket;
     private Socket socket;
     public int count = 0;
-    public List<ClientSocket> clients = new ArrayList<ClientSocket>();
+    public List<Client> clients = new ArrayList<Client>();
     private List<HandlerClients> clientsFlow = new ArrayList<HandlerClients>();
 
 
@@ -28,7 +28,7 @@ public class ServerService {
                 socket = serverSocket.accept();
                 count++;
                 HandlerClients handlerClients = new HandlerClients(socket, this);
-                clients.add(new ClientSocket("User - " + count, LocalDateTime.now(), socket));
+                clients.add(new Client("User - " + count, LocalDateTime.now(), socket));
                 clientsFlow.add(handlerClients);
                 new Thread(handlerClients).start();
             }
@@ -40,7 +40,7 @@ public class ServerService {
                 System.out.println("Server is  stopped!");
                 serverSocket.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println("Connected is down.");
             }
         }
     }
@@ -51,7 +51,7 @@ public class ServerService {
         }
     }
 
-    public void removeClient(HandlerClients handlerClients, ClientSocket clientSocket) {
+    public void removeClient(HandlerClients handlerClients, Client clientSocket) {
         clientsFlow.remove(handlerClients);
         clients.remove(clientSocket);
     }

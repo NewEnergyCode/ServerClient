@@ -1,23 +1,21 @@
 package org.example.service;
 
-import org.example.model.ClientSocket;
+import org.example.model.Client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class HandlerClients implements Runnable {
 
     private ServerService server;
 
-    private List<ClientSocket> clients = new ArrayList<ClientSocket>();
+    private List<Client> clients = new ArrayList<Client>();
     private Socket socket;
     private BufferedReader inMassage;
     private PrintWriter outMassage;
+    private FileInputStream fileIn;
+    private FileOutputStream fileOut;
     private int count;
 
     public HandlerClients(Socket socket, ServerService server) {
@@ -28,7 +26,7 @@ public class HandlerClients implements Runnable {
             this.inMassage = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.outMassage = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Connected is down.");
         }
     }
 
@@ -37,17 +35,24 @@ public class HandlerClients implements Runnable {
             int counter = server.count;
             String name = server.clients.get(counter - 1).getName();
             String clientWord;
+            String clientPath;
             server.sendMassageForAllClients("New Client " + name + " is add.");
             System.out.println("New Client " + name + " is add.");
-            while (!(clientWord = inMassage.readLine()).equals("exit")) {
+            while (!((clientWord = inMassage.readLine()).equals("exit"))
+                    && !((clientWord.equals("-file")))) {
+
                 System.out.println(name + ": " + clientWord);
                 server.sendMassageForAllClients(name + ": " + clientWord);
+
+            }
+            if (clientWord.equals("-file")) {
+                fileSaver(name);
             }
             server.sendMassageForAllClients("Client " + name + " is leave.");
             System.out.println("Client " + name + " is leave.");
             this.close(this, server.clients.get(counter - 1));
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Connected is down.");
         }
     }
 
@@ -55,10 +60,30 @@ public class HandlerClients implements Runnable {
         outMassage.println(massage);
     }
 
-    public void close(HandlerClients handlerClients, ClientSocket clientSocket) {
+    public void close(HandlerClients handlerClients, Client clientSocket) {
         server.removeClient(handlerClients, clientSocket);
         count--;
         server.count--;
+    }
+
+    public void fileSaver(String name) {
+        server.sendMassageForAllClients(name + ", enter path: ");
+        try {
+            fileIn = new FileInputStream(inMassage.readLine());
+            fileOut = new FileOutputStream(new File("src/main/java/org/example/files/" + name + ".txt"),true);
+
+            while (fileIn.available() > 0) {
+                int oneByte = fileIn.read();
+                fileOut.write(oneByte);
+
+            }
+            fileIn.close();
+            fileOut.close();
+
+        } catch (IOException e) {
+            System.out.println("File is not found.");
+        }
+
     }
 
 }
