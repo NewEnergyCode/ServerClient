@@ -38,19 +38,21 @@ public class HandlerClients implements Runnable {
             String clientPath;
             server.sendMassageForAllClients("New Client " + name + " is add.");
             System.out.println("New Client " + name + " is add.");
-            while (!((clientWord = inMassage.readLine()).equals("exit"))
-                    && !((clientWord.equals("-file")))) {
 
-                System.out.println(name + ": " + clientWord);
-                server.sendMassageForAllClients(name + ": " + clientWord);
-
+            while (true){
+                clientWord = inMassage.readLine();
+                switch (clientWord) {
+                    case "exit":
+                        server.sendMassageForAllClients("Client " + name + " is leave.");
+                        System.out.println("Client " + name + " is leave.");
+                        this.close(this, server.clients.get(counter - 1));
+                    case "-file":
+                        fileSaver(name);
+                    default:
+                        System.out.println(name + ": " + clientWord);
+                        server.sendMassageForAllClients(name + ": " + clientWord);
             }
-            if (clientWord.equals("-file")) {
-                fileSaver(name);
             }
-            server.sendMassageForAllClients("Client " + name + " is leave.");
-            System.out.println("Client " + name + " is leave.");
-            this.close(this, server.clients.get(counter - 1));
         } catch (Exception e) {
             System.out.println("Connected is down.");
         }
